@@ -2,6 +2,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import nodeConsole from 'node:console';
 import { skipCSRFCheck } from '@auth/core';
 import Credentials from '@auth/core/providers/credentials';
+import Google from '@auth/core/providers/google';
 import { authHandler, initAuthConfig } from '@hono/auth-js';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { hash, verify } from 'argon2';
@@ -79,6 +80,7 @@ if (process.env.AUTH_SECRET) {
       secret: process.env.AUTH_SECRET,
       basePath: '/api/auth',
       trustHost: true,
+      adapter,
       pages: {
         signIn: '/account/signin',
         signOut: '/account/logout',
@@ -96,6 +98,10 @@ if (process.env.AUTH_SECRET) {
         },
       },
       providers: [
+        Google({
+          clientId: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
         Credentials({
           id: 'credentials-signin',
           name: 'Credentials Sign in',
